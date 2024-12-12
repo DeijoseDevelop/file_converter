@@ -8,9 +8,11 @@ import (
 	"time"
 
 	"github.com/DeijoseDevelop/file_converter/converter"
-	"github.com/DeijoseDevelop/file_converter/json"
 	"github.com/DeijoseDevelop/file_converter/csv"
+	"github.com/DeijoseDevelop/file_converter/json"
+	"github.com/DeijoseDevelop/file_converter/xlsx"
 	"github.com/DeijoseDevelop/file_converter/xml"
+	"github.com/DeijoseDevelop/file_converter/yaml"
 )
 
 type ConvertFunc func(string, string) error
@@ -19,7 +21,7 @@ func main() {
 	start := time.Now()
 
 	path := flag.String("path", "", "Ruta al archivo a convertir")
-	to := flag.String("to", "", "Formato de salida (json, csv, xml, yaml)")
+	to := flag.String("to", "", "Formato de salida (json, csv, xml, yaml, xlsx)")
 	flag.Parse()
 
 	var memStats runtime.MemStats
@@ -32,12 +34,15 @@ func main() {
 		"json": json.ConvertToJson,
 		"csv":  csv.ConvertToCsv,
 		"xml":  xml.ConvertToXml,
-		"yaml": csv.ConvertToCsv,
+		"yaml": yaml.ConvertToYaml,
+		"xlsx": xlsx.ConvertToXlsx,
 	}
 
 	converter.RegisterReadConvertFunc("json", json.ReadJson)
 	converter.RegisterReadConvertFunc("csv", csv.ReadCSV)
 	converter.RegisterReadConvertFunc("xml", xml.ReadXml)
+	converter.RegisterReadConvertFunc("yaml", yaml.ReadYaml)
+	converter.RegisterReadConvertFunc("xlsx", xlsx.ReadXlsx)
 
 	if *path == "" || *to == "" {
 		fmt.Println("Error: Debes proporcionar la ruta al archivo y el formato de salida.")
@@ -47,7 +52,7 @@ func main() {
 	value := convertOptions[*to]
 
 	if value == nil {
-		fmt.Println("Error: seleccione una de estas opciones: json, csv, xml, yaml.")
+		fmt.Println("Error: seleccione una de estas opciones: json, csv, xml, yaml, xlsx.")
 		return
 	}
 
